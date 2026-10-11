@@ -34,6 +34,8 @@ export default function Dashboard() {
   const audioUrlRef = useRef(null)
   const playbackGenerationRef = useRef(0)
   const recognitionRef = useRef(null)
+  const recognitionGenerationRef = useRef(0)
+  const listeningRequestedRef = useRef(false)
 
   useEffect(() => {
     localStorage.setItem('aod_lang', language)
@@ -66,6 +68,8 @@ export default function Dashboard() {
 
   useEffect(
     () => () => {
+      recognitionGenerationRef.current += 1
+      listeningRequestedRef.current = false
       recognitionRef.current?.stop()
       recognitionRef.current = null
     },
@@ -355,9 +359,11 @@ export default function Dashboard() {
     setRunning((r) => !r)
   }
 
-  function toggleListening() {
-    if (recognitionRef.current) {
-      recognitionRef.current.stop()
+  async function toggleListening() {
+    if (listeningRequestedRef.current) {
+      recognitionGenerationRef.current += 1
+      listeningRequestedRef.current = false
+      recognitionRef.current?.stop()
       recognitionRef.current = null
       setIsListening(false)
       setSpeechStatus('Listening stopped.')
@@ -371,73 +377,156 @@ export default function Dashboard() {
       return
     }
 
-    const startRecognition = (locale, retryWithEnglish) => {
-      const recognition = new SpeechRecognition()
-      let shouldRetryWithEnglish = false
-      recognition.lang = locale
-      recognition.onstart = () => {
-        setIsListening(true)
-        setSpeechStatus(
-          locale === 'en-US' && retryWithEnglish === false
-            ? 'Listening in English (fallback)...'
-            : `Listening in ${locale}...`,
-        )
-      }
-      recognition.onresult = (event) => {
-        const transcript = event.results?.[0]?.[0]?.transcript
-        if (transcript) {
-          setSpeechStatus(`Heard: ${transcript}`)
-          speak(`You said: ${transcript}`)
-        }
-      }
-      recognition.onerror = (event) => {
-        if (
-          event.error === 'network' &&
-          retryWithEnglish &&
-          locale.toLowerCase() !== 'en-us'
-        ) {
-          shouldRetryWithEnglish = true
-          setSpeechStatus(
-            `Speech service unavailable for ${locale}; retrying voice input in English.`,
-          )
-          return
-        }
+    const generation = ++recognitionGenerationRef.current
+    listeningRequestedRef.current = true
+    setIsListening(true)
 
-        const errorMessages = {
-          network:
-            'Browser speech service could not connect. Check your internet connection or try Chrome/Edge with English selected.',
-          'not-allowed':
-            'Microphone access was blocked. Allow microphone access for this site and try again.',
-          'audio-capture':
-            'No microphone is available. Connect or enable a microphone, then try again.',
-          'no-speech': 'No speech was detected. Try speaking closer to the microphone.',
-        }
-        setSpeechStatus(
-          errorMessages[event.error] || `Voice input error: ${event.error}`,
-        )
-      }
-      recognition.onend = () => {
-        if (recognitionRef.current !== recognition) return
-        if (shouldRetryWithEnglish) {
-          startRecognition('en-US', false)
-          return
-        }
-        recognitionRef.current = null
-        setIsListening(false)
+    const prepareLocalRecognition = async (targetLocale) => {
+      if (
+        typeof SpeechRecognition.available !== 'function' ||
+        typeof SpeechRecognition.install !== 'function'
+      ) {
+        return false
       }
 
-      recognitionRef.current = recognition
       try {
+        let availability = await SpeechRecognition.available({
+          langs: [targetLocale],
+          processLocally: true,
+        })
+
+        if (availability === 'downloadable' || availability === 'downloading') {
+          setSpeechStatus(`Preparing offline voice input for ${targetLocale}...`)
+          const installed = await SpeechRecognition.install({
+            langs: [targetLocale],
+          })
+          if (!installed) return false
+          availability = await SpeechRecognition.available({
+            langs: [targetLocale],
+            processLocally: true,
+          })
+        }
+
+        return availability === 'available'
+      } catch (err) {
+        console.warn(
+          `On-device speech recognition is unavailable for ${targetLocale}:`,
+          err,
+        )
+        return false
+      }
+    }
+
+    const startRecognition = async (
+      locale,
+      retryWithEnglish,
+      retryOnline = false,
+    ) => {
+      const processLocally = retryOnline
+        ? false
+        : await prepareLocalRecognition(locale)
+      if (generation !== recognitionGenerationRef.current) return
+
+      if (processLocally) {
+        setSpeechStatus(`Listening privately on this device in ${locale}...`)
+      } else if (typeof SpeechRecognition.available === 'function') {
+        setSpeechStatus(
+          `On-device voice input is unavailable for ${locale}; trying browser speech recognition...`,
+        )
+      }
+
+      let recognition
+      let shouldRetryWithEnglish = false
+      let shouldRetryOnline = false
+      const embeddedBrowser = /Electron\//i.test(navigator.userAgent)
+      try {
+        recognition = new SpeechRecognition()
+        recognition.lang = locale
+        if (processLocally && 'processLocally' in recognition) {
+          recognition.processLocally = true
+        }
+        recognition.onresult = (event) => {
+          const transcript = event.results?.[0]?.[0]?.transcript
+          if (transcript) {
+            setSpeechStatus(`Heard: ${transcript}`)
+            speak(`You said: ${transcript}`)
+          }
+        }
+        recognition.onerror = (event) => {
+          if (
+            event.error === 'network' &&
+            retryWithEnglish &&
+            locale.toLowerCase() !== 'en-us'
+          ) {
+            shouldRetryWithEnglish = true
+            setSpeechStatus(
+              `Speech service unavailable for ${locale}; retrying voice input in English.`,
+            )
+            return
+          }
+
+          if (
+            processLocally &&
+            ['language-not-supported', 'service-not-allowed'].includes(event.error)
+          ) {
+            shouldRetryOnline = true
+            setSpeechStatus(
+              `Offline voice input is unavailable for ${locale}; trying the browser speech service.`,
+            )
+            return
+          }
+
+          const errorMessages = {
+            network: embeddedBrowser
+              ? 'Voice recognition is unavailable in this VS Code preview. Open this page in Chrome or Edge, allow microphone access, and tap Listen again.'
+              : 'Voice recognition could not connect. Check your internet connection, allow microphone access, and tap Listen to retry.',
+            'not-allowed':
+              'Microphone access was blocked. Allow microphone access for this site and try again.',
+            'audio-capture':
+              'No microphone is available. Connect or enable a microphone, then try again.',
+            'no-speech': 'No speech was detected. Try speaking closer to the microphone.',
+          }
+          setSpeechStatus(
+            errorMessages[event.error] || `Voice input error: ${event.error}`,
+          )
+        }
+        recognition.onend = () => {
+          if (recognitionRef.current !== recognition) return
+          if (shouldRetryWithEnglish) {
+            void startRecognition('en-US', false)
+            return
+          }
+          if (shouldRetryOnline) {
+            void startRecognition(locale, retryWithEnglish, true)
+            return
+          }
+          recognitionRef.current = null
+          listeningRequestedRef.current = false
+          setIsListening(false)
+        }
+        recognition.onstart = () => {
+          setIsListening(true)
+          if (!processLocally) {
+            setSpeechStatus(
+              locale === 'en-US' && retryWithEnglish === false
+                ? 'Listening in English (fallback)...'
+                : `Listening in ${locale}...`,
+            )
+          }
+        }
+        recognitionRef.current = recognition
         recognition.start()
       } catch (err) {
-        recognitionRef.current = null
+        if (generation !== recognitionGenerationRef.current) return
+        if (recognitionRef.current === recognition) recognitionRef.current = null
+        listeningRequestedRef.current = false
         setIsListening(false)
         setSpeechStatus(`Could not start voice input: ${err.message}`)
       }
     }
 
     const locale = LANGUAGES.find((item) => item.code === language)?.tts || 'en-US'
-    startRecognition(locale, true)
+    await startRecognition(locale, true)
   }
 
   function handleGetLocation() {

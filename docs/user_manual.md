@@ -14,6 +14,13 @@ detection. Warning and danger alerts are spoken in the browser when speech
 synthesis is available. Frames may be JPEG, PNG, or WebP and must be 10 MiB or
 smaller.
 
+The **Listen** button uses on-device speech recognition when the browser
+supports it. The browser may need to download a speech language pack the first
+time; microphone permission is also required. If local recognition is not
+available, the app falls back to the browser's online speech service. If that
+service reports a network error, open the site in Chrome or Edge, check the
+internet connection, and tap **Listen** again.
+
 The selected alert language is saved in the browser. English uses browser
 speech synthesis; most non-English alerts use the authenticated `/api/tts`
 endpoint and Google Translate TTS. Tigrinya (`ti`), Oromo (`om`), and Somali
