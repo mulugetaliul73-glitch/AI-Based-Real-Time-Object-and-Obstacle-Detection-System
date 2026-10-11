@@ -1,0 +1,830 @@
+/* ============================================
+   AI OBSTACLE DETECTION — HUBSPOT STYLE
+   With teal hero header (like HubSpot KB)
+   ============================================ */
+
+:root {
+    --teal: #00bda5;
+    --teal-dark: #00a4bd;
+    --teal-darker: #0091ae;
+    --coral: #ff5c35;
+    --coral-light: #ff8a5f;
+    --danger: #f2545b;
+
+    --bg-page: #f5f8fa;
+    --bg-card: #ffffff;
+    --bg-soft: #eaf0f6;
+
+    --text-dark: #2d3e50;
+    --text-body: #33475b;
+    --text-muted: #516f90;
+    --text-light: #7c98b6;
+
+    --border: #eaf0f6;
+    --border-strong: #cbd6e2;
+
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow-sm: 0 1px 3px rgba(45, 62, 80, 0.06);
+    --shadow-md: 0 4px 8px rgba(45, 62, 80, 0.1);
+    --shadow-lg: 0 10px 20px rgba(45, 62, 80, 0.12);
+
+    --gradient-teal: linear-gradient(135deg, #00bda5 0%, #00a4bd 100%);
+    --gradient-coral: linear-gradient(135deg, #ff5c35 0%, #ff8a5f 100%);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+    background: var(--bg-page) !important;
+    color: var(--text-body) !important;
+    font-family: 'Lexend Deca', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-dark) !important;
+    font-weight: 700;
+}
+
+p, span, label {
+    color: var(--text-body);
+}
+
+a {
+    color: var(--teal-dark);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+a:hover {
+    color: var(--teal-darker);
+    text-decoration: underline;
+}
+
+/* ============================================
+   DASHBOARD PAGE
+   ============================================ */
+.dashboard-page,
+.dashboard,
+.dashboard-container,
+.main-content,
+.app-container {
+    background: var(--bg-page) !important;
+    min-height: 100vh;
+    padding: 2rem;
+    color: var(--text-body) !important;
+}
+
+/* ============================================
+   HEADER — Teal hero section (like HubSpot!)
+   ============================================ */
+.dashboard-header,
+.header {
+    background: var(--gradient-teal) !important;
+    padding: 3rem 2rem !important;
+    border-radius: var(--radius) !important;
+    border: none !important;
+    box-shadow: 0 10px 30px rgba(0, 189, 165, 0.25) !important;
+    margin-bottom: 2rem !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 1rem !important;
+    flex-wrap: wrap !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+/* Add a subtle glow like HubSpot */
+.dashboard-header::before,
+.header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 60%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+/* WELCOME label — white text on teal */
+.welcome-label,
+.dashboard-header .welcome,
+.dashboard-header p:first-child,
+.welcome,
+.dashboard-header p {
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-size: 0.8rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.15em !important;
+    text-transform: uppercase !important;
+    margin: 0 0 0.5rem 0 !important;
+}
+
+/* User name — big white bold text */
+.welcome-title,
+.dashboard-header h1,
+.dashboard-header h1 * {
+    color: #ffffff !important;
+    font-size: 2.5rem !important;
+    font-weight: 800 !important;
+    background: none !important;
+    -webkit-text-fill-color: #ffffff !important;
+    margin: 0 !important;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    letter-spacing: -0.5px !important;
+}
+
+/* Log out button on teal header — coral */
+.btn-logout,
+.logout-btn {
+    background: var(--gradient-coral) !important;
+    color: white !important;
+    padding: 0.75rem 1.6rem !important;
+    border: none !important;
+    border-radius: var(--radius-sm) !important;
+    font-weight: 600 !important;
+    font-size: 0.9rem !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 12px rgba(255, 92, 53, 0.3) !important;
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+.btn-logout:hover,
+.logout-btn:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 20px rgba(255, 92, 53, 0.45) !important;
+}
+
+/* ============================================
+   STAT CARDS
+   ============================================ */
+.stats-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+    gap: 1.25rem !important;
+    margin-bottom: 2rem !important;
+}
+
+.stat-card {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius) !important;
+    padding: 1.75rem 1.5rem !important;
+    text-align: center !important;
+    box-shadow: var(--shadow-sm) !important;
+    transition: all 0.3s ease !important;
+    cursor: pointer !important;
+}
+
+.stat-card:hover {
+    transform: translateY(-6px) !important;
+    box-shadow: var(--shadow-lg) !important;
+    border-color: var(--teal) !important;
+}
+
+.stat-label,
+.stat-card h3,
+.stat-card p:first-child {
+    color: var(--text-muted) !important;
+    font-size: 0.85rem !important;
+    font-weight: 500 !important;
+    margin: 0 0 0.5rem 0 !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+}
+
+.stat-value,
+.stat-card p:last-child,
+.stat-card h2 {
+    color: var(--text-dark) !important;
+    font-size: 1.75rem !important;
+    font-weight: 800 !important;
+    margin: 0 !important;
+    -webkit-text-fill-color: var(--text-dark) !important;
+}
+
+/* ============================================
+   LIVE DETECTION SECTION
+   ============================================ */
+.live-section,
+.live-detection {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius) !important;
+    padding: 1.75rem !important;
+    margin-bottom: 2rem !important;
+    box-shadow: var(--shadow-sm) !important;
+}
+
+.live-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    margin-bottom: 1.5rem !important;
+    flex-wrap: wrap !important;
+    gap: 1rem !important;
+}
+
+.live-header h2,
+.live-section h2 {
+    color: var(--text-dark) !important;
+    font-size: 1.35rem !important;
+    font-weight: 700 !important;
+    margin: 0 !important;
+}
+
+.live-controls {
+    display: flex !important;
+    align-items: center !important;
+    gap: 1rem !important;
+    flex-wrap: wrap;
+}
+
+/* Start Detection button — teal */
+.btn,
+.btn-success {
+    background: var(--gradient-teal) !important;
+    color: white !important;
+    padding: 0.7rem 1.5rem !important;
+    border: none !important;
+    border-radius: var(--radius-sm) !important;
+    font-weight: 600 !important;
+    font-size: 0.9rem !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 12px rgba(0, 189, 165, 0.3) !important;
+}
+
+.btn:hover,
+.btn-success:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 20px rgba(0, 189, 165, 0.4) !important;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #f2545b 0%, #e04e2b 100%) !important;
+    color: white !important;
+}
+
+.voice-toggle {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    color: var(--text-body) !important;
+    font-size: 0.9rem !important;
+    cursor: pointer !important;
+}
+
+.voice-toggle input {
+    accent-color: var(--teal) !important;
+    width: auto !important;
+}
+
+.voice-status {
+    color: #7f1d1d;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    max-width: 24rem;
+}
+
+.btn-voice-test {
+    padding: 0.55rem 0.8rem !important;
+    font-size: 0.85rem !important;
+}
+
+.btn-voice-test:disabled {
+    cursor: not-allowed !important;
+    opacity: 0.55;
+}
+
+.btn-voice-input {
+    background: linear-gradient(135deg, #ff8a5f 0%, #ff5c35 100%) !important;
+}
+
+.btn-location {
+    background: linear-gradient(135deg, #00bda5 0%, #00a4bd 100%) !important;
+}
+
+.btn-voice-input:disabled {
+    cursor: not-allowed !important;
+    opacity: 0.55;
+    transform: none !important;
+}
+
+.battery-badge {
+    background: #e5f9f7;
+    color: #007c94;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    border: 1px solid #a3e6e0;
+    white-space: nowrap;
+}
+
+.battery-unavailable {
+    color: var(--text-body);
+    background: var(--bg-card);
+    border-color: var(--border);
+    white-space: normal;
+}
+
+.location-status {
+    color: var(--text-body);
+    font-size: 0.85rem;
+}
+
+/* Camera grid */
+.live-grid {
+    display: grid !important;
+    grid-template-columns: 1.5fr 1fr !important;
+    gap: 1.5rem !important;
+}
+
+@media (max-width: 900px) {
+    .live-grid { grid-template-columns: 1fr !important; }
+}
+
+.camera-wrapper {
+    background: #000 !important;
+    border-radius: var(--radius) !important;
+    overflow: hidden !important;
+    aspect-ratio: 4 / 3 !important;
+    position: relative !important;
+}
+
+.camera-wrapper video,
+.camera-wrapper canvas {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+}
+
+.live-side {
+    background: var(--bg-soft) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius) !important;
+    padding: 1.25rem !important;
+    color: var(--text-body) !important;
+}
+
+.live-side h3 {
+    color: var(--text-dark) !important;
+    font-size: 1rem !important;
+    margin: 0 0 1rem 0 !important;
+}
+
+.live-side p,
+.muted {
+    color: var(--text-light) !important;
+    font-size: 0.9rem !important;
+}
+
+/* ============================================
+   HISTORY / RECENT DETECTIONS
+   ============================================ */
+.history-section,
+.recent-section {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius) !important;
+    padding: 1.75rem !important;
+    margin-bottom: 2rem !important;
+    box-shadow: var(--shadow-sm) !important;
+}
+
+.history-section h2,
+.recent-section h2 {
+    color: var(--text-dark) !important;
+    font-size: 1.35rem !important;
+    font-weight: 700 !important;
+    margin: 0 0 1rem 0 !important;
+}
+
+.history-list,
+.list {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+}
+
+.history-item,
+.item {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    background: var(--bg-soft) !important;
+    padding: 0.85rem 1.15rem !important;
+    border-radius: var(--radius-sm) !important;
+    border: 1px solid var(--border) !important;
+    color: var(--text-body) !important;
+}
+
+.history-label,
+.item strong {
+    color: var(--text-dark) !important;
+    font-weight: 600 !important;
+}
+
+.history-confidence,
+.item span {
+    color: var(--text-muted) !important;
+    font-size: 0.85rem !important;
+}
+
+/* ============================================
+   AUTH PAGES (Login / Register) — Teal gradient
+   ============================================ */
+.auth-body,
+.auth-shell,
+.auth-container,
+.login-page,
+.register-page {
+    min-height: 100vh !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: var(--gradient-teal) !important;
+    padding: 1rem !important;
+}
+
+.auth-box,
+.auth-card,
+.login-box,
+.register-box {
+    width: 100% !important;
+    max-width: 440px !important;
+    background: #ffffff !important;
+    padding: 2.5rem 2rem !important;
+    border-radius: 16px !important;
+    box-shadow: 0 20px 40px rgba(45, 62, 80, 0.2) !important;
+    border: 1px solid var(--border) !important;
+    color: var(--text-body) !important;
+}
+
+.auth-box h1,
+.auth-box h2,
+.login-box h1,
+.login-box h2 {
+    text-align: center !important;
+    color: var(--text-dark) !important;
+    margin-bottom: 0.5rem !important;
+    font-size: 1.6rem !important;
+    font-weight: 800 !important;
+}
+
+.auth-box h3,
+.auth-box p,
+.login-box p {
+    text-align: center !important;
+    color: var(--text-muted) !important;
+    margin-bottom: 1.5rem !important;
+    font-size: 0.95rem !important;
+    font-weight: 400 !important;
+}
+
+.auth-box button[type="submit"],
+.login-box button[type="submit"] {
+    width: 100% !important;
+    margin-top: 1rem !important;
+    padding: 0.85rem !important;
+    font-size: 1rem !important;
+    background: var(--gradient-coral) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: var(--radius-sm) !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+}
+
+.auth-box button[type="submit"]:hover,
+.login-box button[type="submit"]:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 10px 20px rgba(255, 92, 53, 0.35) !important;
+}
+
+.auth-link {
+    text-align: center !important;
+    margin-top: 1.25rem !important;
+    color: var(--text-muted) !important;
+    font-size: 0.9rem !important;
+}
+
+.auth-link a {
+    color: var(--teal-dark) !important;
+    font-weight: 600 !important;
+}
+
+/* ============================================
+   FORMS
+   ============================================ */
+input,
+textarea,
+select {
+    width: 100% !important;
+    padding: 0.7rem 1rem !important;
+    background: #ffffff !important;
+    color: var(--text-body) !important;
+    border: 1px solid var(--border-strong) !important;
+    border-radius: var(--radius-sm) !important;
+    font-size: 0.95rem !important;
+    font-family: inherit !important;
+    transition: all 0.3s ease !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none !important;
+    border-color: var(--teal-dark) !important;
+    box-shadow: 0 0 0 4px rgba(0, 164, 189, 0.15) !important;
+}
+
+input::placeholder {
+    color: var(--text-light) !important;
+}
+
+label {
+    display: block !important;
+    color: var(--text-body) !important;
+    font-weight: 600 !important;
+    font-size: 0.875rem !important;
+    margin-bottom: 0.4rem !important;
+}
+
+/* ============================================
+   ALERTS
+   ============================================ */
+.alert {
+    padding: 0.75rem 1rem !important;
+    border-radius: var(--radius-sm) !important;
+    margin-bottom: 1rem !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    border-left: 4px solid !important;
+}
+
+.alert-danger,
+.error {
+    background: #fee5e6 !important;
+    color: #b83e21 !important;
+    border-color: #f2545b !important;
+}
+
+.alert-warning {
+    background: #fff5e0 !important;
+    color: #b87700 !important;
+    border-color: #f5a623 !important;
+}
+
+.alert-safe,
+.alert-success {
+    background: #e5f9f7 !important;
+    color: #007c94 !important;
+    border-color: var(--teal) !important;
+}
+
+/* ============================================
+   SCROLLBAR
+   ============================================ */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-page); }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-light); }
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+    .dashboard-page { padding: 1rem !important; }
+    .dashboard-header { padding: 2rem 1.25rem !important; }
+    .welcome-title { font-size: 1.75rem !important; }
+    .stats-grid { grid-template-columns: 1fr !important; }
+    .live-grid { grid-template-columns: 1fr !important; }
+    .dashboard-header { flex-direction: column !important; text-align: center !important; }
+    .btn-logout { width: 100% !important; margin-top: 1rem !important; }
+}
+/* ============================================
+   FULL-BLEED TEAL HEADER (edge-to-edge)
+   ============================================ */
+
+/* Remove padding from the page wrapper */
+.dashboard-page,
+.dashboard,
+.dashboard-container,
+.main-content,
+.app-container {
+    padding: 0 !important;
+    background: #f5f8fa !important;
+}
+
+/* Make the teal header stretch edge-to-edge */
+.dashboard-header,
+.header {
+    background: linear-gradient(135deg, #00bda5 0%, #00a4bd 100%) !important;
+    padding: 3rem 4rem !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 1rem !important;
+    position: relative !important;
+}
+
+/* Re-add inner padding to the rest of the page */
+.stats-grid,
+.live-section,
+.live-detection,
+.history-section,
+.recent-section {
+    margin-left: 4rem !important;
+    margin-right: 4rem !important;
+}
+
+/* Stats grid spacing */
+.stats-grid {
+    margin-top: 2.5rem !important;
+    margin-bottom: 2rem !important;
+}
+
+/* Bottom margin for last section */
+.history-section,
+.recent-section {
+    margin-bottom: 4rem !important;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .dashboard-header,
+    .header {
+        padding: 2rem 1.5rem !important;
+        text-align: center !important;
+        flex-direction: column !important;
+    }
+
+    .stats-grid,
+    .live-section,
+    .live-detection,
+    .history-section,
+    .recent-section {
+        margin-left: 1rem !important;
+        margin-right: 1rem !important;
+    }
+
+    .welcome-title {
+        font-size: 1.75rem !important;
+    }
+
+    .btn-logout {
+        width: 100% !important;
+        margin-top: 1rem !important;
+    }
+}
+.dashboard-page {
+    padding: 2rem;
+}
+.dashboard-header {
+    padding: 3rem 2rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+}
+/* ============================================
+   FULL-WIDTH TEAL HEADER
+   ============================================ */
+
+.dashboard-page,
+.dashboard,
+.dashboard-container,
+.main-content,
+.app-container {
+    padding: 0 !important;
+    background: #f5f8fa !important;
+}
+
+.dashboard-header,
+.header {
+    background: linear-gradient(135deg, #00bda5 0%, #00a4bd 100%) !important;
+    padding: 3rem 4rem !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+.stats-grid,
+.live-section,
+.live-detection,
+.history-section,
+.recent-section {
+    margin-left: 4rem !important;
+    margin-right: 4rem !important;
+}
+
+.stats-grid {
+    margin-top: 2.5rem !important;
+}
+
+.history-section,
+.recent-section {
+    margin-bottom: 4rem !important;
+}
+
+@media (max-width: 768px) {
+    .dashboard-header,
+    .header {
+        padding: 2rem 1.5rem !important;
+        flex-direction: column !important;
+        text-align: center !important;
+    }
+
+    .stats-grid,
+    .live-section,
+    .live-detection,
+    .history-section,
+    .recent-section {
+        margin-left: 1rem !important;
+        margin-right: 1rem !important;
+    }
+}
+/* ============================================
+   LANGUAGE SELECTOR
+   ============================================ */
+
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+    z-index: 1;
+    flex-wrap: wrap;
+}
+.language-select {
+    background: rgba(255, 255, 255, 0.95) !important;
+    color: #2d3e50 !important;
+    border: 2px solid rgba(255, 255, 255, 0.5) !important;
+    border-radius: 8px !important;
+    padding: 0.7rem 1rem !important;
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    min-width: 220px !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+.language-select:hover {
+    border-color: #00bda5 !important;
+    box-shadow: 0 6px 16px rgba(0, 189, 165, 0.35) !important;
+    transform: translateY(-1px);
+}
+
+.language-select:focus {
+    outline: none !important;
+    border-color: #00bda5 !important;
+    box-shadow: 0 0 0 4px rgba(0, 189, 165, 0.3) !important;
+}
+
+.language-select option {
+    background: #ffffff;
+    color: #2d3e50;
+    padding: 0.5rem;
+    font-size: 0.95rem;
+}
+
+/* Mobile: stack them */
+@media (max-width: 768px) {
+    .header-controls {
+        width: 100%;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .language-select {
+        width: 100% !important;
+        min-width: auto !important;
+    }
+}
